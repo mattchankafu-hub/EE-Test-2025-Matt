@@ -13,27 +13,37 @@ st.set_page_config(
 # --- 注入自訂 CSS 徹底修正手機排版 ---
 st.markdown("""
     <style>
-    /* 調整頂部空間，留出安全距離避免被手機頂部列擋住 */
+    /* 1. 調整整體網頁的上下左右邊距，讓手機螢幕利用率更高 */
     .block-container {
-        padding-top: 2.5rem !important; 
+        padding-top: 2rem !important; 
         padding-bottom: 2rem !important;
+        padding-left: 1rem !important; 
+        padding-right: 1rem !important;
     }
     
-    /* === 徹底解決手機版按鈕超出螢幕的問題 === */
-    /* 1. 強制水平容器不換行，並設定按鈕間距 */
+    /* === 2. 徹底解決手機版「上一題/下一題」按鈕超出螢幕的問題 === */
+    /* 強制水平容器不換行，並設定按鈕間距 */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 12px !important; /* 兩個按鈕中間的空隙 */
+        gap: 10px !important; 
         width: 100% !important;
     }
     
-    /* 2. 強制裡面的兩個分欄「絕對均分」空間，無視內容原本大小 */
+    /* 強制裡面的兩個分欄「絕對均分」空間 */
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-        flex: 1 1 0px !important; /* 這是最關鍵的一行：0px 基準強迫平分 */
+        flex: 1 1 0px !important; 
+        width: 50% !important;
+        min-width: 0 !important; /* 這是關鍵：允許容器縮到比內容還小 */
+    }
+    
+    /* 強制按鈕本身乖乖待在 50% 的容器內，絕對不准撐破 */
+    div[data-testid="stHorizontalBlock"] button {
         width: 100% !important;
-        min-width: 0 !important;
+        min-width: 0 !important; /* 抵銷 Streamlit 按鈕的預設最小寬度 */
+        padding-left: 0px !important; 
+        padding-right: 0px !important;
     }
     </style>
 """, unsafe_allow_html=True)
