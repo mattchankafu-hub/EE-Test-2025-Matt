@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed" 
 )
 
-# --- 注入自訂 CSS：只保留邊距壓縮，刪除複雜的分欄排版 ---
+# --- 注入自訂 CSS：壓縮頂部與調整網頁極致邊距 ---
 st.markdown("""
     <style>
     /* 調整整體網頁的上下左右邊距，讓畫面更緊湊 */
@@ -115,10 +115,11 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 # 未選擇的其他選項：保持深灰色
                 bg_color, border_color, text_color, icon = "#262730", "#3a3b45", "#ffffff", "⬜"
                 
+            # 移除 margin-bottom，調整 padding 到了 6px 12px 並加入 box-sizing，使其大小與原生按鈕完全一致不跳動
             st.markdown(f"""
             <div style="background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; 
-                        padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 500;
-                        text-align: center;">
+                        padding: 6px 12px; border-radius: 8px; font-size: 16px; font-weight: 500;
+                        text-align: center; box-sizing: border-box; width: 100%;">
                 {icon} {opt_letter}. {opt_text}
             </div>
             """, unsafe_allow_html=True)
@@ -130,16 +131,17 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 st.session_state.answers_dict[st.session_state.current_index] = opt_letter
                 st.rerun()
 
-    st.write("---")
+    # 使用自訂 HTML 線條，將 margin-top 壓到極低的 2px，隨後直接緊跟按鈕，大幅縮小空隙
+    st.markdown("<hr style='margin-top: 2px; margin-bottom: 8px; border: 0; border-top: 1px solid #3a3b45;'>", unsafe_allow_html=True)
     
-    # --- 導航按鈕區 (改為全寬度、上下排列) ---
+    # --- 導航按鈕區 (全寬度、上下排列) ---
     # 1. 上方放「上一題」
     if st.session_state.current_index > 0:
         if st.button("⬅️ 上一題", use_container_width=True):
             st.session_state.current_index -= 1
             st.rerun()
             
-    # 2. 下方放「下一題」或「查看成績」 (前提是已作答)
+    # 2. 下方放「下一題」或「查看成績」
     if is_answered:
         if st.session_state.current_index < total_q_count - 1:
             if st.button("下一題 ➡️", use_container_width=True):
