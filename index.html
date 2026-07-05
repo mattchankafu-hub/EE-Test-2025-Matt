@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>電工模擬試題練習系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        /* === 基礎深色模式設定 === */
+        body {
+            background-color: #0e1117;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        /* === 標題與選單列 === */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* === 題目區 === */
+        .question-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* === 選項按鈕 === */
+        .option-btn {
+            display: block;
+            width: 100%;
+            background-color: #262730;
+            border: 1px solid #3a3b45;
+            color: white;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .option-btn:hover { border-color: #ffffff; }
+        
+        /* 狀態顏色 */
+        .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default;}
+        .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default;}
+        .opt-disabled { cursor: default; opacity: 0.8; }
+
+        /* === 導航按鈕區 (完美 48% 排版) === */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .nav-btn {
+            width: 48%;
+            background-color: #262730;
+            border: 1px solid #3a3b45;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .nav-btn:hover { border-color: #ffffff; }
+
+        /* === 進度條 === */
+        .progress-text {
+            font-size: 14px;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            background-color: #262730;
+            border-radius: 4px;
+            height: 8px;
+        }
+        .progress-bar-fill {
+            background-color: #3b82f6;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        /* === 側邊選單 (Overlay) === */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            right: -250px;
+            background-color: #1e1e24;
+            transition: 0.3s;
+            padding-top: 60px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .sidebar select, .sidebar button {
+            width: 90%;
+            margin: 10px 5%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .sidebar button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 30px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        hr { border: 0; border-top: 1px solid #3a3b45; margin: 5px 0 15px 0; }
+        
+        /* 隱藏區塊用 */
+        .hidden { display: none !important; }
+        .result-box {
+            background-color: #262730; padding: 15px; border-radius: 8px; margin-bottom: 10px;
+        }
+        .result-correct { border-left: 5px solid #2e7d32; }
+        .result-wrong { border-left: 5px solid #d32f2f; }
+        .result-miss { border-left: 5px solid #f59e0b; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar" class="sidebar">
+    <button class="close-btn" onclick="toggleSidebar()">×</button>
+    <h3 style="text-align: center; margin-top: 0;">⚙️ 題庫設定</h3>
+    <select id="rangeSelect"></select>
+    <button onclick="startNewQuiz()">🚀 開始 / 重新測驗</button>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h3>⚡ 電工模擬試題</h3>
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    </div>
+
+    <div id="loadingView">
+        <p>🔄 正在從 GitHub 讀取題庫，請稍候...</p>
+    </div>
+
+    <div id="quizView" class="hidden">
+        <div class="question-title" id="qNum">第 0 題</div>
+        <div class="question-text" id="qText">載入中...</div>
+        
+        <div id="optionsContainer">
+            </div>
+
+        <hr>
+
+        <div class="nav-container">
+            <button class="nav-btn" id="btnPrev" onclick="prevQuestion()">⬅️ 上一題</button>
+            <button class="nav-btn" id="btnNext" onclick="nextQuestion()">下一題 ➡️</button>
+        </div>
+
+        <div class="progress-text" id="progressText">進度： 0 / 0</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div id="resultView" class="hidden">
+        <h2 style="color: #4ade80;">🎉 測驗結束！</h2>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <div><h3>答對題數</h3><h2 id="scoreText">0 / 0</h2></div>
+            <div><h3>準確率</h3><h2 id="percentText">0%</h2></div>
+        </div>
+        <hr>
+        <h3>📋 詳細對錯報告</h3>
+        <div id="reportContainer"></div>
+        <button class="nav-btn" style="width: 100%; margin-top: 20px;" onclick="viewLastQuestion()">⬅️ 返回檢查最後一題</button>
+    </div>
+</div>
+
+<script>
+    // === 核心變數 ===
+    const CSV_FILE_NAME = "EE Quiz CSV-8.csv"; // 確保與你 GitHub 上的檔名完全一致
+    let allQuestions = [];
+    let currentQuestions = [];
+    let state = {
+        currentIndex: 0,
+        answers: {}, // 格式: { 題號索引: "A" }
+        selectedRange: "1-50"
+    };
+
+    // === 初始化與讀取 CSV ===
+    window.onload = function() {
+        Papa.parse(CSV_FILE_NAME, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                allQuestions = results.data.filter(row => row['題號'] && row['題目']); // 過濾空行
+                buildRangeSelector();
+                loadProgress(); // 嘗試讀取本地記憶
+            },
+            error: function(err) {
+                document.getElementById('loadingView').innerHTML = "<p style='color:red;'>讀取失敗，請確認 CSV 檔案存在於 GitHub 中且檔名正確。</p>";
+            }
+        });
+    };
+
+    // 建立下拉選單
+    function buildRangeSelector() {
+        const select = document.getElementById('rangeSelect');
+        const limit = Math.min(allQuestions.length, 400);
+        for (let i = 0; i < limit; i += 50) {
+            let start = i + 1;
+            let end = Math.min(i + 50, limit);
+            let option = document.createElement('option');
+            option.value = `${start}-${end}`;
+            option.text = `${start}-${end}`;
+            select.appendChild(option);
+        }
+    }
+
+    // === LocalStorage 記憶功能 ===
+    function saveProgress() {
+        localStorage.setItem('EE_Quiz_Progress', JSON.stringify(state));
+    }
+
+    function loadProgress() {
+        const saved = localStorage.getItem('EE_Quiz_Progress');
+        if (saved) {
+            state = JSON.parse(saved);
+            document.getElementById('rangeSelect').value = state.selectedRange;
+            applyRange(false); // 載入題目但不重置進度
+        } else {
+            startNewQuiz(); // 第一次使用，開啟新測驗
+        }
+    }
+
+    // === 遊戲控制 ===
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        sb.style.right = sb.style.right === '0px' ? '-250px' : '0px';
+    }
+
+    function startNewQuiz() {
+        state.selectedRange = document.getElementById('rangeSelect').value;
+        state.currentIndex = 0;
+        state.answers = {};
+        saveProgress();
+        applyRange(true);
+        toggleSidebar();
+    }
+
+    function applyRange(isReset) {
+        let parts = state.selectedRange.split('-');
+        let startIdx = parseInt(parts[0]) - 1;
+        let endIdx = parseInt(parts[1]);
+        currentQuestions = allQuestions.slice(startIdx, endIdx);
+        
+        document.getElementById('loadingView').classList.add('hidden');
+        document.getElementById('resultView').classList.add('hidden');
+        document.getElementById('quizView').classList.remove('hidden');
+        
+        renderQuestion();
+    }
+
+    // === 渲染畫面 ===
+    function renderQuestion() {
+        if (state.currentIndex >= currentQuestions.length) {
+            showResults();
+            return;
+        }
+
+        const qData = currentQuestions[state.currentIndex];
+        document.getElementById('qNum').innerText = `第 ${qData['題號']} 題`;
+        document.getElementById('qText').innerText = qData['題目'];
+
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = ""; // 清空選項
+
+        const options = { 'A': qData['選擇A'], 'B': qData['選擇B'], 'C': qData['選擇C'], 'D': qData['選擇D'] };
+        const correctAns = (qData['答案'] || "").trim().toUpperCase();
+        const userAns = state.answers[state.currentIndex];
+
+        for (let [key, val] of Object.entries(options)) {
+            let btn = document.createElement('button');
+            btn.className = "option-btn";
+            
+            if (userAns) { // 已作答狀態
+                btn.classList.add("opt-disabled");
+                if (key === correctAns) {
+                    btn.classList.add("opt-correct");
+                    btn.innerHTML = `✅ ${key}. ${val}`;
+                } else if (key === userAns && userAns !== correctAns) {
+                    btn.classList.add("opt-wrong");
+                    btn.innerHTML = `❌ ${key}. ${val}`;
+                } else {
+                    btn.innerHTML = `&nbsp;&nbsp;&nbsp;${key}. ${val}`; // 排版對齊
+                }
+            } else { // 未作答狀態
+                btn.innerHTML = `&nbsp;&nbsp;&nbsp;${key}. ${val}`;
+                btn.onclick = () => selectOption(key);
+            }
+            container.appendChild(btn);
+        }
+
+        // 按鈕狀態控制
+        document.getElementById('btnPrev').style.visibility = state.currentIndex > 0 ? "visible" : "hidden";
+        
+        const btnNext = document.getElementById('btnNext');
+        if (state.currentIndex < currentQuestions.length - 1) {
+            btnNext.innerText = "下一題 ➡️";
+        } else {
+            btnNext.innerText = "查看成績 🏆";
+        }
+
+        // 進度條
+        const total = currentQuestions.length;
+        const current = state.currentIndex + 1;
+        document.getElementById('progressText').innerText = `進度： ${current} / ${total}`;
+        document.getElementById('progressBar').style.width = `${(current / total) * 100}%`;
+    }
+
+    function selectOption(choice) {
+        state.answers[state.currentIndex] = choice;
+        saveProgress(); // 選擇後立即自動記憶
+        renderQuestion();
+    }
+
+    function prevQuestion() {
+        if (state.currentIndex > 0) {
+            state.currentIndex--;
+            saveProgress();
+            renderQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        state.currentIndex++;
+        saveProgress();
+        renderQuestion();
+    }
+
+    // === 成績結算 ===
+    function showResults() {
+        document.getElementById('quizView').classList.add('hidden');
+        document.getElementById('resultView').classList.remove('hidden');
+
+        let score = 0;
+        let total = currentQuestions.length;
+        let reportHTML = "";
+
+        currentQuestions.forEach((qData, idx) => {
+            let userAns = state.answers[idx];
+            let correctAns = (qData['答案'] || "").trim().toUpperCase();
+            
+            if (userAns === correctAns) {
+                score++;
+                reportHTML += `<div class="result-box result-correct"><b>第 ${qData['題號']} 題：✅ 答對</b></div>`;
+            } else if (!userAns) {
+                reportHTML += `<div class="result-box result-miss"><b>第 ${qData['題號']} 題：⚠️ 未作答</b><br><span style="color:#a0a0a0;">正確答案：${correctAns}</span></div>`;
+            } else {
+                reportHTML += `<div class="result-box result-wrong"><b>第 ${qData['題號']} 題：❌ 答錯</b><br><span style="color:#a0a0a0;">你的選擇：${userAns} | 正確答案：${correctAns}</span></div>`;
+            }
+        });
+
+        document.getElementById('scoreText').innerText = `${score} / ${total}`;
+        document.getElementById('percentText').innerText = `${((score/total)*100).toFixed(1)}%`;
+        document.getElementById('reportContainer').innerHTML = reportHTML;
+    }
+
+    function viewLastQuestion() {
+        state.currentIndex = currentQuestions.length - 1;
+        saveProgress();
+        document.getElementById('resultView').classList.add('hidden');
+        document.getElementById('quizView').classList.remove('hidden');
+        renderQuestion();
+    }
+</script>
+
+</body>
+</html>
