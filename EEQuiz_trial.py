@@ -10,23 +10,30 @@ st.set_page_config(
     initial_sidebar_state="collapsed" 
 )
 
-# --- 注入自訂 CSS 修正手機排版 ---
+# --- 注入自訂 CSS 徹底修正手機排版 ---
 st.markdown("""
     <style>
     /* 調整頂部空間，留出安全距離避免被手機頂部列擋住 */
     .block-container {
-        padding-top: 3rem !important; 
+        padding-top: 2.5rem !important; 
         padding-bottom: 2rem !important;
     }
     
-    /* 強制所有分欄 (上一題/下一題按鈕) 在手機上保持左右並排，且精準各佔 50% 寬度 */
-    [data-testid="stHorizontalBlock"] {
+    /* === 徹底解決手機版按鈕超出螢幕的問題 === */
+    /* 1. 強制水平容器不換行，並設定按鈕間距 */
+    div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 10px !important; /* 兩個按鈕中間的空隙 */
+        gap: 12px !important; /* 兩個按鈕中間的空隙 */
+        width: 100% !important;
     }
-    [data-testid="column"] {
+    
+    /* 2. 強制裡面的兩個分欄「絕對均分」空間，無視內容原本大小 */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+        flex: 1 1 0px !important; /* 這是最關鍵的一行：0px 基準強迫平分 */
+        width: 100% !important;
         min-width: 0 !important;
-        flex: 1 1 50% !important; /* 強制各佔一半 */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -82,7 +89,7 @@ if st.session_state.all_questions:
 
 # ================= 5. 主畫面：測驗與成績單 =================
 # 標題稍微向下移一點點，字體保持緊湊
-st.markdown("<h3 style='margin-top: 10px; margin-bottom: 5px;'>⚡ 電工模擬試題</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='margin-top: 5px; margin-bottom: 5px;'>⚡ 電工模擬試題</h3>", unsafe_allow_html=True)
 
 if not st.session_state.quiz_active:
     st.info("👈 題庫已就緒！請打開左上角選單 (>) 選擇題組並點擊「開始測驗」。")
@@ -152,7 +159,6 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     with col2:
         if is_answered:
             if st.session_state.current_index < total_q_count - 1:
-                # 取消了 type="primary"，保持預設低調的深灰色底色
                 if st.button("下一題 ➡️", use_container_width=True):
                     st.session_state.current_index += 1
                     st.rerun()
