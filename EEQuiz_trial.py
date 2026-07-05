@@ -10,37 +10,38 @@ st.set_page_config(
     initial_sidebar_state="collapsed" 
 )
 
-# --- 注入自訂 CSS：靠左靠右的相對排版魔法 ---
+# --- 注入自訂 CSS：百分比精準對齊魔法 ---
 st.markdown("""
     <style>
-    /* 1. 調整頂部空間，加得更深，絕對不會再被手機頂部列或 Share 按鈕擋住 */
+    /* 1. 調整整體網頁的上下左右邊距 */
     .block-container {
-        padding-top: 3.5rem !important; 
+        padding-top: 2.5rem !important; 
         padding-bottom: 2rem !important;
         padding-left: 1rem !important; 
         padding-right: 1rem !important;
     }
     
-    /* === 2. 完美的「一個靠左、一個靠右」相對排版 === */
-    /* 將水平容器設定為 space-between (左右靠邊對齊) */
+    /* === 2. 讓底部導航按鈕與答案按鈕完美對齊 === */
+    /* 設定水平容器為 100% 寬，並讓內部元素均勻分佈 */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
-        justify-content: space-between !important; 
+        justify-content: center !important; /* 置中整個視窗 */
+        align-items: center !important;
         flex-wrap: nowrap !important;
-        gap: 0px !important; /* 取消硬性空隙，由 space-between 自動產生距離 */
         width: 100% !important;
+        gap: 4% !important; /* 中間精準留下 4% 的空隙 */
     }
     
-    /* 每個按鈕的容器固定佔用 47% 的寬度，留下 6% 的彈性空間作為中間的空隙 */
+    /* 強制上一題、下一題的容器各佔 48% (48+4+48=100%，完美對齊上方答案) */
     div[data-testid="column"] {
-        width: 47% !important;
-        flex: none !important;
+        width: 48% !important;
+        flex: 0 0 48% !important; 
         min-width: 0 !important;
     }
     
-    /* 確保按鈕本身乖乖填滿那 47% 的空間 */
-    div[data-testid="stHorizontalBlock"] button {
+    /* 確保按鈕本身乖乖填滿那 48% 的空間 */
+    div[data-testid="column"] button {
         width: 100% !important;
         min-width: 0 !important; 
     }
