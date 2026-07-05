@@ -73,7 +73,8 @@ if st.session_state.all_questions:
         st.session_state.quiz_active = True
 
 # ================= 5. 主畫面：測驗與成績單 =================
-st.markdown("<h3 style='margin-top: 5px; margin-bottom: 5px;'>⚡ 電工模擬試題</h3>", unsafe_allow_html=True)
+# 將標題改為自訂 div，並將字體縮小至 18px (約縮小 20%)
+st.markdown("<div style='margin-top: 5px; margin-bottom: 15px; font-size: 18px; font-weight: bold;'>⚡ 電工模擬試題</div>", unsafe_allow_html=True)
 
 if not st.session_state.quiz_active:
     st.info("👈 題庫已就緒！請打開左上角選單 (>) 選擇題組並點擊「開始測驗」。")
@@ -82,9 +83,6 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     # --- 正在測驗中 ---
     current_q_count = st.session_state.current_index + 1
     total_q_count = len(st.session_state.current_questions)
-    
-    st.caption(f"進度： {current_q_count} / {total_q_count}")
-    st.progress(st.session_state.current_index / total_q_count)
     
     q_data = st.session_state.current_questions[st.session_state.current_index]
     correct_answer = q_data['答案'].strip().upper()
@@ -115,7 +113,6 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 # 未選擇的其他選項：保持深灰色
                 bg_color, border_color, text_color, icon = "#262730", "#3a3b45", "#ffffff", "⬜"
                 
-            # 關鍵修正：加入 margin-bottom: 14px; 完美還原原生按鈕的間隔，padding 保持 8px 12px 維持大小不變
             st.markdown(f"""
             <div style="background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; 
                         padding: 8px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 16px; font-weight: 500;
@@ -151,6 +148,11 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
             if st.button("查看成績 🏆", use_container_width=True):
                 st.session_state.current_index += 1
                 st.rerun()
+                
+    # --- 進度條移至最底部 ---
+    st.write("") # 稍微留一點點空隙
+    st.caption(f"進度： {current_q_count} / {total_q_count}")
+    st.progress(st.session_state.current_index / total_q_count)
 
 else:
     # --- 測驗結束，顯示成績單 ---
@@ -164,7 +166,6 @@ else:
                 
     percentage = (score / total_q_count) * 100
     
-    st.progress(1.0)
     st.success(f"🎉 **測驗結束！**")
     
     col1, col2 = st.columns(2)
@@ -188,3 +189,7 @@ else:
     if st.button("⬅️ 返回檢查最後一題", use_container_width=True):
         st.session_state.current_index -= 1
         st.rerun()
+        
+    st.write("")
+    st.caption("進度： 完成")
+    st.progress(1.0)
