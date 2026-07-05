@@ -18,12 +18,11 @@ if 'current_questions' not in st.session_state:
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
 if 'answers_dict' not in st.session_state:
-    st.session_state.answers_dict = {} # 改用字典來記憶每一題的答案：{ index: "A" }
+    st.session_state.answers_dict = {} 
 if 'quiz_active' not in st.session_state:
     st.session_state.quiz_active = False
 
 # ================= 3. 自動讀取 GitHub 上的 CSV =================
-# 這裡填寫你在 GitHub 上的 CSV 確切檔名
 CSV_FILE_NAME = "EE Quiz CSV-8.csv"
 
 if not st.session_state.all_questions:
@@ -57,11 +56,10 @@ if st.session_state.all_questions:
         start_idx, end_idx = map(int, selected_range.split("-"))
         st.session_state.current_questions = st.session_state.all_questions[start_idx-1 : end_idx]
         st.session_state.current_index = 0
-        st.session_state.answers_dict = {} # 清空作答紀錄
+        st.session_state.answers_dict = {} 
         st.session_state.quiz_active = True
 
 # ================= 5. 主畫面：測驗與成績單 =================
-# 自訂 HTML 縮小標題字體約 30%
 st.markdown("<h2 style='font-size: 26px; font-weight: bold; margin-bottom: 20px;'>⚡ 電工模擬試題練習系統</h2>", unsafe_allow_html=True)
 
 if not st.session_state.quiz_active:
@@ -89,28 +87,28 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     st.markdown(f"#### {q_data['題目']}")
     st.write("---")
     
-    # 判斷這題是否已經回答過
     is_answered = st.session_state.current_index in st.session_state.answers_dict
     
     if is_answered:
-        # 【已作答狀態】：顯示即時顏色回饋
+        # 【已作答狀態】：顯示深色即時顏色回饋
         user_ans = st.session_state.answers_dict[st.session_state.current_index]
         
         for opt_letter, opt_text in options.items():
             if opt_letter == correct_answer:
-                # 正確答案 -> 綠色
-                bg_color, border_color, text_color, icon = "#d4edda", "#c3e6cb", "#155724", "✅"
+                # 答對：深綠色背景，白色文字
+                bg_color, border_color, text_color, icon = "#2e7d32", "#1b5e20", "#ffffff", "✅"
             elif opt_letter == user_ans and user_ans != correct_answer:
-                # 選錯的答案 -> 紅色
-                bg_color, border_color, text_color, icon = "#f8d7da", "#f5c6cb", "#721c24", "❌"
+                # 答錯：深紅色背景，白色文字
+                bg_color, border_color, text_color, icon = "#d32f2f", "#b71c1c", "#ffffff", "❌"
             else:
-                # 其他沒選的答案 -> 灰色
-                bg_color, border_color, text_color, icon = "#f8f9fa", "#dae0e5", "#6c757d", "⬜"
+                # 未選擇的其他選項：淺灰色背景，深灰色文字 (與原本按鈕相似)
+                bg_color, border_color, text_color, icon = "#f0f2f6", "#f0f2f6", "#31333F", "⬜"
                 
-            # 渲染顏色選項框
+            # 調整 padding (8px 12px) 和 font-size (15px) 讓大小與預設按鈕一致
             st.markdown(f"""
-            <div style="background-color: {bg_color}; border: 2px solid {border_color}; color: {text_color}; 
-                        padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 16px; font-weight: bold;">
+            <div style="background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; 
+                        padding: 8px 12px; border-radius: 8px; margin-bottom: 15px; font-size: 15px; font-weight: 500;
+                        text-align: center;">
                 {icon} {opt_letter}. {opt_text}
             </div>
             """, unsafe_allow_html=True)
@@ -127,14 +125,12 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     # --- 導航按鈕區 ---
     col1, col2 = st.columns(2)
     with col1:
-        # 如果不是第一題，就顯示「上一題」按鈕
         if st.session_state.current_index > 0:
             if st.button("⬅️ 上一題", use_container_width=True):
                 st.session_state.current_index -= 1
                 st.rerun()
                 
     with col2:
-        # 只有在「已作答」的情況下，才允許前往「下一題」或「查看成績」
         if is_answered:
             if st.session_state.current_index < total_q_count - 1:
                 if st.button("下一題 ➡️", use_container_width=True, type="primary"):
@@ -149,7 +145,6 @@ else:
     # --- 測驗結束，計算與顯示成績單 ---
     total_q_count = len(st.session_state.current_questions)
     
-    # 計算分數 (比對字典裡的答案與正確答案)
     score = 0
     for idx, q_data in enumerate(st.session_state.current_questions):
         if idx in st.session_state.answers_dict:
@@ -179,7 +174,6 @@ else:
                 st.write(f"你的選擇： `{user_choice}`")
                 st.write(f"**正確答案： `{correct_answer}`**")
                 
-    # 提供返回上一題的按鈕，允許重新查看最後一題
     if st.button("⬅️ 返回檢查最後一題", use_container_width=True):
         st.session_state.current_index -= 1
         st.rerun()
