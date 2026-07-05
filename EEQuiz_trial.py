@@ -103,21 +103,22 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
         user_ans = st.session_state.answers_dict[st.session_state.current_index]
         
         for opt_letter, opt_text in options.items():
+            icon_str = ""
             if opt_letter == correct_answer:
                 # 答對：深綠色背景
-                bg_color, border_color, text_color, icon = "#2e7d32", "#1b5e20", "#ffffff", "✅"
+                bg_color, border_color, text_color, icon_str = "#2e7d32", "#1b5e20", "#ffffff", "✅ "
             elif opt_letter == user_ans and user_ans != correct_answer:
                 # 答錯：深紅色背景
-                bg_color, border_color, text_color, icon = "#d32f2f", "#b71c1c", "#ffffff", "❌"
+                bg_color, border_color, text_color, icon_str = "#d32f2f", "#b71c1c", "#ffffff", "❌ "
             else:
-                # 未選擇的其他選項：保持深灰色
-                bg_color, border_color, text_color, icon = "#262730", "#3a3b45", "#ffffff", "⬜"
+                # 未選擇的其他選項：保持深灰色，並取消方塊圖示
+                bg_color, border_color, text_color = "#262730", "#3a3b45", "#ffffff"
                 
             st.markdown(f"""
             <div style="background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; 
                         padding: 8px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 16px; font-weight: 500;
                         text-align: center; box-sizing: border-box; width: 100%;">
-                {icon} {opt_letter}. {opt_text}
+                {icon_str}{opt_letter}. {opt_text}
             </div>
             """, unsafe_allow_html=True)
             
@@ -131,26 +132,25 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     # 使用自訂 HTML 線條，大幅縮小與按鈕之間的空隙
     st.markdown("<hr style='margin-top: 2px; margin-bottom: 10px; border: 0; border-top: 1px solid #3a3b45;'>", unsafe_allow_html=True)
     
-    # --- 導航按鈕區 (全寬度、上下排列) ---
-    # 1. 上方放「上一題」
+    # --- 導航按鈕區 (全寬度、上下排列、永遠常駐) ---
+    # 1. 上方放「上一題」 (只要不是第一題就顯示)
     if st.session_state.current_index > 0:
         if st.button("⬅️ 上一題", use_container_width=True):
             st.session_state.current_index -= 1
             st.rerun()
             
-    # 2. 下方放「下一題」或「查看成績」
-    if is_answered:
-        if st.session_state.current_index < total_q_count - 1:
-            if st.button("下一題 ➡️", use_container_width=True):
-                st.session_state.current_index += 1
-                st.rerun()
-        else:
-            if st.button("查看成績 🏆", use_container_width=True):
-                st.session_state.current_index += 1
-                st.rerun()
+    # 2. 下方放「下一題」或「查看成績」 (永遠顯示，不依賴是否已作答)
+    if st.session_state.current_index < total_q_count - 1:
+        if st.button("下一題 ➡️", use_container_width=True):
+            st.session_state.current_index += 1
+            st.rerun()
+    else:
+        if st.button("查看成績 🏆", use_container_width=True):
+            st.session_state.current_index += 1
+            st.rerun()
                 
     # --- 進度條移至最底部 ---
-    st.write("") # 稍微留一點點空隙
+    st.write("") 
     st.caption(f"進度： {current_q_count} / {total_q_count}")
     st.progress(st.session_state.current_index / total_q_count)
 
@@ -181,6 +181,10 @@ else:
         
         if user_choice == correct_answer:
             st.success(f"**第 {q_data['題號']} 題：✅ 答對**")
+        elif user_choice == "未作答":
+            # 新增：針對未作答題目的專屬黃色提示
+            with st.warning(f"**第 {q_data['題號']} 題：⚠️ 未作答**"):
+                st.write(f"**正確答案： `{correct_answer}`**")
         else:
             with st.error(f"**第 {q_data['題號']} 題：❌ 答錯**"):
                 st.write(f"你的選擇： `{user_choice}`")
