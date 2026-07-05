@@ -16,7 +16,6 @@
             display: flex;
             justify-content: center;
         }
-        
         .container {
             width: 100%;
             max-width: 600px;
@@ -29,138 +28,81 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        .header h3 {
-            margin: 0;
-            font-size: 20px;
-        }
+        .header h3 { margin: 0; font-size: 20px; }
         .menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
+            background: none; border: none; color: white;
+            font-size: 24px; cursor: pointer;
+        }
+
+        /* === 考試計時器 === */
+        #timerContainer {
+            background-color: #ef4444; color: white; text-align: center;
+            padding: 8px; border-radius: 8px; margin-bottom: 15px;
+            font-weight: bold; font-size: 16px; letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
         /* === 題目區 === */
-        .question-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #a0a0a0;
-            margin-bottom: 5px;
-        }
-        .question-text {
-            font-size: 18px;
-            font-weight: bold;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
+        .question-title { font-size: 16px; font-weight: bold; color: #a0a0a0; margin-bottom: 5px; }
+        .question-text { font-size: 18px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
 
         /* === 選項按鈕 === */
         .option-btn {
-            display: block;
-            width: 100%;
-            background-color: #262730;
-            border: 1px solid #3a3b45;
-            color: white;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.2s;
+            display: block; width: 100%;
+            background-color: #262730; border: 1px solid #3a3b45; color: white;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 12px;
+            font-size: 16px; font-weight: 500; cursor: pointer;
+            text-align: left; transition: 0.2s; box-sizing: border-box;
         }
         .option-btn:hover { border-color: #ffffff; }
         
         /* 狀態顏色 */
-        .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default;}
-        .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default;}
+        .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default; text-align: center;}
+        .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default; text-align: center;}
+        .opt-selected { background-color: #3b82f6 !important; border-color: #60a5fa !important; text-align: center;} /* 考試模式選取狀態 */
         .opt-disabled { cursor: default; opacity: 0.8; }
+        .opt-center { text-align: center; } /* 未作答時置中 */
 
-        /* === 導航按鈕區 (完美 48% 排版) === */
+        /* === 導航按鈕區 === */
         .nav-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            margin-bottom: 15px;
+            display: flex; justify-content: space-between;
+            margin-top: 15px; margin-bottom: 15px;
         }
         .nav-btn {
-            width: 48%;
-            background-color: #262730;
-            border: 1px solid #3a3b45;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 15px;
-            cursor: pointer;
+            width: 48%; background-color: #262730; border: 1px solid #3a3b45; color: white;
+            padding: 12px; border-radius: 8px; font-size: 15px; cursor: pointer;
         }
         .nav-btn:hover { border-color: #ffffff; }
 
         /* === 進度條 === */
-        .progress-text {
-            font-size: 14px;
-            color: #a0a0a0;
-            margin-bottom: 5px;
-        }
-        .progress-bar-bg {
-            width: 100%;
-            background-color: #262730;
-            border-radius: 4px;
-            height: 8px;
-        }
-        .progress-bar-fill {
-            background-color: #3b82f6;
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
+        .progress-text { font-size: 14px; color: #a0a0a0; margin-bottom: 5px; }
+        .progress-bar-bg { width: 100%; background-color: #262730; border-radius: 4px; height: 8px; }
+        .progress-bar-fill { background-color: #3b82f6; height: 100%; border-radius: 4px; transition: width 0.3s; }
 
-        /* === 側邊選單 (Overlay) === */
+        /* === 側邊選單 === */
         .sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            right: -250px;
-            background-color: #1e1e24;
-            transition: 0.3s;
-            padding-top: 60px;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
-            z-index: 1000;
+            height: 100%; width: 260px; position: fixed; top: 0; right: -260px;
+            background-color: #1e1e24; transition: 0.3s; padding-top: 50px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;
         }
+        .sidebar h3 { text-align: center; margin-top: 0; font-size: 18px;}
         .sidebar select, .sidebar button {
-            width: 90%;
-            margin: 10px 5%;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
+            width: 90%; margin: 8px 5%; padding: 10px; font-size: 15px; border-radius: 5px; box-sizing: border-box;
         }
-        .sidebar button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+        .sidebar button { background-color: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold;}
+        .btn-exam { background-color: #ef4444 !important; }
+        .btn-exam:hover { background-color: #dc2626 !important; }
         .close-btn {
-            position: absolute;
-            top: 10px;
-            left: 15px;
-            font-size: 30px;
-            color: white;
-            background: none;
-            border: none;
-            cursor: pointer;
+            position: absolute; top: 10px; left: 15px; font-size: 30px;
+            color: white; background: none; border: none; cursor: pointer;
         }
-        hr { border: 0; border-top: 1px solid #3a3b45; margin: 5px 0 15px 0; }
+        hr { border: 0; border-top: 1px solid #3a3b45; margin: 10px 0 15px 0; }
         
         /* 隱藏區塊用 */
         .hidden { display: none !important; }
-        .result-box {
-            background-color: #262730; padding: 15px; border-radius: 8px; margin-bottom: 10px;
-        }
+        .result-box { background-color: #262730; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
         .result-correct { border-left: 5px solid #2e7d32; }
         .result-wrong { border-left: 5px solid #d32f2f; }
         .result-miss { border-left: 5px solid #f59e0b; }
@@ -170,29 +112,41 @@
 
 <div id="sidebar" class="sidebar">
     <button class="close-btn" onclick="toggleSidebar()">×</button>
-    <h3 style="text-align: center; margin-top: 0;">⚙️ 題庫設定</h3>
+    
+    <h3>⚙️ 練習模式 (即時解答)</h3>
     <select id="rangeSelect"></select>
-    <button onclick="startNewQuiz()">🚀 開始 / 重新測驗</button>
+    <button onclick="startPracticeMode()">開始循序練習</button>
+    
+    <hr style="margin-top: 20px;">
+
+    <h3>📝 考試模式 (模擬測驗)</h3>
+    <button class="btn-exam" onclick="startExamMode()">⏱️ 開始 60 分鐘模擬考</button>
+    <p style="font-size: 12px; color: #a0a0a0; text-align: center; padding: 0 15px; line-height: 1.5;">
+        從題庫中隨機抽取 100 題。<br>作答期間可修改答案，不會提示對錯，時間到自動交卷。
+    </p>
 </div>
 
 <div class="container">
     <div class="header">
-        <h3>⚡ 電工模擬試題</h3>
+        <h3 style="font-size: 18px; font-weight: bold;">⚡ 電工模擬試題</h3>
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
     </div>
 
     <div id="loadingView">
-        <p>🔄 正在從 GitHub 讀取題庫，請稍候...</p>
+        <p>🔄 正在載入題庫，請稍候...</p>
     </div>
 
     <div id="quizView" class="hidden">
+        <div id="timerContainer" class="hidden">
+            <span id="timerText">⏳ 剩餘時間: 60分 00秒</span>
+        </div>
+
         <div class="question-title" id="qNum">第 0 題</div>
         <div class="question-text" id="qText">載入中...</div>
         
-        <div id="optionsContainer">
-            </div>
+        <div id="optionsContainer"></div>
 
-        <hr>
+        <hr style="margin-top: 5px; margin-bottom: 10px;">
 
         <div class="nav-container">
             <button class="nav-btn" id="btnPrev" onclick="prevQuestion()">⬅️ 上一題</button>
@@ -206,7 +160,7 @@
     </div>
 
     <div id="resultView" class="hidden">
-        <h2 style="color: #4ade80;">🎉 測驗結束！</h2>
+        <h2 style="color: #4ade80;" id="resultTitle">🎉 測驗結束！</h2>
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
             <div><h3>答對題數</h3><h2 id="scoreText">0 / 0</h2></div>
             <div><h3>準確率</h3><h2 id="percentText">0%</h2></div>
@@ -214,20 +168,24 @@
         <hr>
         <h3>📋 詳細對錯報告</h3>
         <div id="reportContainer"></div>
-        <button class="nav-btn" style="width: 100%; margin-top: 20px;" onclick="viewLastQuestion()">⬅️ 返回檢查最後一題</button>
+        <button class="nav-btn" style="width: 100%; margin-top: 20px;" onclick="viewLastQuestion()">⬅️ 返回考卷進行複習</button>
     </div>
 </div>
 
 <script>
     // === 核心變數 ===
-    const CSV_FILE_NAME = "EE Quiz CSV-8.csv"; // 確保與你 GitHub 上的檔名完全一致
+    const CSV_FILE_NAME = "EE Quiz CSV-8.csv"; 
     let allQuestions = [];
     let currentQuestions = [];
     let state = {
+        mode: 'practice', // 'practice' 或是 'exam'
+        examFinished: false, // 考試是否已交卷
+        examEndTime: null, // 考試結束時間戳記
         currentIndex: 0,
-        answers: {}, // 格式: { 題號索引: "A" }
+        answers: {}, 
         selectedRange: "1-50"
     };
+    let timerInterval = null;
 
     // === 初始化與讀取 CSV ===
     window.onload = function() {
@@ -235,9 +193,9 @@
             download: true,
             header: true,
             complete: function(results) {
-                allQuestions = results.data.filter(row => row['題號'] && row['題目']); // 過濾空行
+                allQuestions = results.data.filter(row => row['題號'] && row['題目']); 
                 buildRangeSelector();
-                loadProgress(); // 嘗試讀取本地記憶
+                loadProgress(); 
             },
             error: function(err) {
                 document.getElementById('loadingView').innerHTML = "<p style='color:red;'>讀取失敗，請確認 CSV 檔案存在於 GitHub 中且檔名正確。</p>";
@@ -245,7 +203,6 @@
         });
     };
 
-    // 建立下拉選單
     function buildRangeSelector() {
         const select = document.getElementById('rangeSelect');
         const limit = Math.min(allQuestions.length, 400);
@@ -254,53 +211,121 @@
             let end = Math.min(i + 50, limit);
             let option = document.createElement('option');
             option.value = `${start}-${end}`;
-            option.text = `${start}-${end}`;
+            option.text = `${start}-${end} 題`;
             select.appendChild(option);
         }
     }
 
-    // === LocalStorage 記憶功能 ===
+    // === 記憶功能 ===
     function saveProgress() {
-        localStorage.setItem('EE_Quiz_Progress', JSON.stringify(state));
+        localStorage.setItem('EE_Quiz_Progress_V2', JSON.stringify(state));
+        localStorage.setItem('EE_Quiz_Questions_V2', JSON.stringify(currentQuestions));
     }
 
     function loadProgress() {
-        const saved = localStorage.getItem('EE_Quiz_Progress');
-        if (saved) {
-            state = JSON.parse(saved);
+        const savedState = localStorage.getItem('EE_Quiz_Progress_V2');
+        const savedQuestions = localStorage.getItem('EE_Quiz_Questions_V2');
+        
+        if (savedState && savedQuestions) {
+            state = JSON.parse(savedState);
+            currentQuestions = JSON.parse(savedQuestions);
             document.getElementById('rangeSelect').value = state.selectedRange;
-            applyRange(false); // 載入題目但不重置進度
+            
+            // 如果是在考試模式中，檢查時間是否已經到了
+            if (state.mode === 'exam' && !state.examFinished) {
+                let now = new Date().getTime();
+                if (now >= state.examEndTime) {
+                    state.examFinished = true; // 時間已過，自動設定為交卷
+                }
+            }
+            
+            document.getElementById('loadingView').classList.add('hidden');
+            document.getElementById('resultView').classList.add('hidden');
+            document.getElementById('quizView').classList.remove('hidden');
+            
+            if (state.mode === 'exam' && !state.examFinished) startTimer();
+            renderQuestion();
         } else {
-            startNewQuiz(); // 第一次使用，開啟新測驗
+            document.getElementById('loadingView').classList.add('hidden');
+            toggleSidebar(); // 第一次進入，直接展開右側選單讓用戶選擇
         }
     }
 
-    // === 遊戲控制 ===
     function toggleSidebar() {
         const sb = document.getElementById('sidebar');
-        sb.style.right = sb.style.right === '0px' ? '-250px' : '0px';
+        sb.style.right = sb.style.right === '0px' ? '-260px' : '0px';
     }
 
-    function startNewQuiz() {
+    // === 模式控制 ===
+    // 啟動練習模式
+    function startPracticeMode() {
+        state.mode = 'practice';
+        state.examFinished = false;
         state.selectedRange = document.getElementById('rangeSelect').value;
         state.currentIndex = 0;
         state.answers = {};
-        saveProgress();
-        applyRange(true);
-        toggleSidebar();
-    }
-
-    function applyRange(isReset) {
+        
         let parts = state.selectedRange.split('-');
         let startIdx = parseInt(parts[0]) - 1;
         let endIdx = parseInt(parts[1]);
         currentQuestions = allQuestions.slice(startIdx, endIdx);
         
-        document.getElementById('loadingView').classList.add('hidden');
+        if(timerInterval) clearInterval(timerInterval);
+        
+        saveProgress();
+        document.getElementById('resultView').classList.add('hidden');
+        document.getElementById('quizView').classList.remove('hidden');
+        renderQuestion();
+        toggleSidebar();
+    }
+
+    // 啟動考試模式
+    function startExamMode() {
+        if(allQuestions.length === 0) return alert("題庫未載入！");
+        
+        let confirmStart = confirm("即將開始 60 分鐘模擬考，中途交卷或超時將自動結算成績。確定開始嗎？");
+        if(!confirmStart) return;
+
+        state.mode = 'exam';
+        state.examFinished = false;
+        state.currentIndex = 0;
+        state.answers = {};
+        state.examEndTime = new Date().getTime() + (60 * 60 * 1000); // 60分鐘後
+        
+        // 隨機抽取 100 題
+        let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffled.slice(0, 100);
+        
+        saveProgress();
         document.getElementById('resultView').classList.add('hidden');
         document.getElementById('quizView').classList.remove('hidden');
         
+        startTimer();
         renderQuestion();
+        toggleSidebar();
+    }
+
+    // === 考試計時器 ===
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById('timerContainer').classList.remove('hidden');
+        
+        timerInterval = setInterval(() => {
+            let now = new Date().getTime();
+            let distance = state.examEndTime - now;
+            
+            if (distance <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timerText').innerText = "⏳ 考試結束";
+                alert("⏳ 考試時間已到！系統將自動為您交卷並結算成績。");
+                showResults();
+                return;
+            }
+            
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById('timerText').innerText = `⏳ 剩餘時間: ${minutes}分 ${seconds < 10 ? '0':''}${seconds}秒`;
+        }, 1000);
     }
 
     // === 渲染畫面 ===
@@ -311,34 +336,62 @@
         }
 
         const qData = currentQuestions[state.currentIndex];
-        document.getElementById('qNum').innerText = `第 ${qData['題號']} 題`;
+        
+        // 考試模式顯示計時器，練習模式隱藏
+        if (state.mode === 'exam' && !state.examFinished) {
+            document.getElementById('timerContainer').classList.remove('hidden');
+        } else {
+            document.getElementById('timerContainer').classList.add('hidden');
+        }
+
+        // 標題顯示
+        let prefix = state.mode === 'exam' ? "模擬考" : "練習";
+        document.getElementById('qNum').innerText = `【${prefix}】 第 ${state.currentIndex + 1} 題 (原題號:${qData['題號']})`;
         document.getElementById('qText').innerText = qData['題目'];
 
         const container = document.getElementById('optionsContainer');
-        container.innerHTML = ""; // 清空選項
+        container.innerHTML = ""; 
 
         const options = { 'A': qData['選擇A'], 'B': qData['選擇B'], 'C': qData['選擇C'], 'D': qData['選擇D'] };
         const correctAns = (qData['答案'] || "").trim().toUpperCase();
         const userAns = state.answers[state.currentIndex];
 
+        // 判斷是否要顯示正確答案 (練習模式，或考試模式已交卷複習時)
+        const showCorrectness = (state.mode === 'practice') || (state.mode === 'exam' && state.examFinished);
+
         for (let [key, val] of Object.entries(options)) {
             let btn = document.createElement('button');
             btn.className = "option-btn";
             
-            if (userAns) { // 已作答狀態
-                btn.classList.add("opt-disabled");
-                if (key === correctAns) {
-                    btn.classList.add("opt-correct");
-                    btn.innerHTML = `✅ ${key}. ${val}`;
-                } else if (key === userAns && userAns !== correctAns) {
-                    btn.classList.add("opt-wrong");
-                    btn.innerHTML = `❌ ${key}. ${val}`;
+            if (showCorrectness) {
+                // === 顯示對錯模式 ===
+                if (userAns) { 
+                    btn.classList.add("opt-disabled");
+                    if (key === correctAns) {
+                        btn.classList.add("opt-correct");
+                        btn.innerHTML = `✅ ${key}. ${val}`;
+                    } else if (key === userAns && userAns !== correctAns) {
+                        btn.classList.add("opt-wrong");
+                        btn.innerHTML = `❌ ${key}. ${val}`;
+                    } else {
+                        btn.innerHTML = `&nbsp;&nbsp;&nbsp;${key}. ${val}`; 
+                    }
                 } else {
-                    btn.innerHTML = `&nbsp;&nbsp;&nbsp;${key}. ${val}`; // 排版對齊
+                    btn.classList.add("opt-center");
+                    btn.innerHTML = `${key}. ${val}`;
+                    // 只有未交卷且未作答時可以按 (練習模式)
+                    if(!state.examFinished) btn.onclick = () => selectOption(key);
                 }
-            } else { // 未作答狀態
-                btn.innerHTML = `&nbsp;&nbsp;&nbsp;${key}. ${val}`;
-                btn.onclick = () => selectOption(key);
+            } else {
+                // === 考試進行模式 (不顯示對錯，只標示選取，且可修改) ===
+                if (key === userAns) {
+                    btn.classList.add("opt-selected");
+                    btn.innerHTML = `🔘 ${key}. ${val}`;
+                } else {
+                    btn.classList.add("opt-center");
+                    btn.innerHTML = `${key}. ${val}`;
+                }
+                btn.onclick = () => selectOption(key); // 考試中隨時可更改答案
             }
             container.appendChild(btn);
         }
@@ -349,8 +402,15 @@
         const btnNext = document.getElementById('btnNext');
         if (state.currentIndex < currentQuestions.length - 1) {
             btnNext.innerText = "下一題 ➡️";
+            btnNext.onclick = nextQuestion;
         } else {
-            btnNext.innerText = "查看成績 🏆";
+            // 最後一題的按鈕
+            if (state.mode === 'exam' && !state.examFinished) {
+                btnNext.innerText = "正式交卷 🏆";
+            } else {
+                btnNext.innerText = "查看成績 🏆";
+            }
+            btnNext.onclick = showResults;
         }
 
         // 進度條
@@ -362,8 +422,14 @@
 
     function selectOption(choice) {
         state.answers[state.currentIndex] = choice;
-        saveProgress(); // 選擇後立即自動記憶
-        renderQuestion();
+        saveProgress(); 
+        
+        // 如果是練習模式，選完自動跳下一題的延遲體驗；考試模式則停留在原地讓用戶確認
+        if (state.mode === 'practice') {
+            renderQuestion();
+        } else {
+            renderQuestion(); // 更新藍色選項，不自動跳下一題
+        }
     }
 
     function prevQuestion() {
@@ -375,15 +441,29 @@
     }
 
     function nextQuestion() {
-        state.currentIndex++;
-        saveProgress();
-        renderQuestion();
+        if (state.currentIndex < currentQuestions.length - 1) {
+            state.currentIndex++;
+            saveProgress();
+            renderQuestion();
+        }
     }
 
     // === 成績結算 ===
     function showResults() {
+        // 如果是考試模式，觸發交卷
+        if (state.mode === 'exam' && !state.examFinished) {
+            let confirmSubmit = confirm("確定要交卷結算成績嗎？交卷後將無法修改答案。");
+            if (!confirmSubmit && new Date().getTime() < state.examEndTime) return; // 如果時間還沒到且取消交卷，則返回
+            
+            state.examFinished = true;
+            if(timerInterval) clearInterval(timerInterval);
+            saveProgress();
+        }
+
         document.getElementById('quizView').classList.add('hidden');
         document.getElementById('resultView').classList.remove('hidden');
+
+        document.getElementById('resultTitle').innerText = state.mode === 'exam' ? "🏆 模擬考結算成績" : "🎉 練習結束！";
 
         let score = 0;
         let total = currentQuestions.length;
@@ -393,13 +473,16 @@
             let userAns = state.answers[idx];
             let correctAns = (qData['答案'] || "").trim().toUpperCase();
             
+            // 報告清單加上內部跳轉，點擊可直接回去看那一題
+            let jumpLink = `<a href="javascript:void(0)" onclick="jumpToQuestion(${idx})" style="color:#3b82f6; text-decoration:none; font-size:14px; float:right;">🔍 查看此題</a>`;
+
             if (userAns === correctAns) {
                 score++;
-                reportHTML += `<div class="result-box result-correct"><b>第 ${qData['題號']} 題：✅ 答對</b></div>`;
+                reportHTML += `<div class="result-box result-correct"><b>第 ${idx + 1} 題 (原題號:${qData['題號']})：✅ 答對</b> ${jumpLink}</div>`;
             } else if (!userAns) {
-                reportHTML += `<div class="result-box result-miss"><b>第 ${qData['題號']} 題：⚠️ 未作答</b><br><span style="color:#a0a0a0;">正確答案：${correctAns}</span></div>`;
+                reportHTML += `<div class="result-box result-miss"><b>第 ${idx + 1} 題 (原題號:${qData['題號']})：⚠️ 未作答</b> ${jumpLink}<br><span style="color:#a0a0a0;">正確答案：${correctAns}</span></div>`;
             } else {
-                reportHTML += `<div class="result-box result-wrong"><b>第 ${qData['題號']} 題：❌ 答錯</b><br><span style="color:#a0a0a0;">你的選擇：${userAns} | 正確答案：${correctAns}</span></div>`;
+                reportHTML += `<div class="result-box result-wrong"><b>第 ${idx + 1} 題 (原題號:${qData['題號']})：❌ 答錯</b> ${jumpLink}<br><span style="color:#a0a0a0;">你的選擇：${userAns} | 正確答案：${correctAns}</span></div>`;
             }
         });
 
@@ -409,7 +492,15 @@
     }
 
     function viewLastQuestion() {
-        state.currentIndex = currentQuestions.length - 1;
+        state.currentIndex = 0; // 回到第一題開始複習
+        saveProgress();
+        document.getElementById('resultView').classList.add('hidden');
+        document.getElementById('quizView').classList.remove('hidden');
+        renderQuestion();
+    }
+    
+    function jumpToQuestion(idx) {
+        state.currentIndex = idx;
         saveProgress();
         document.getElementById('resultView').classList.add('hidden');
         document.getElementById('quizView').classList.remove('hidden');
