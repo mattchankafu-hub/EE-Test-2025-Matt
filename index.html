@@ -33,28 +33,28 @@
         .question-title { font-size: 16px; font-weight: bold; color: #a0a0a0; margin-bottom: 5px; }
         .question-text { font-size: 18px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
 
-        /* === 選項按鈕 === */
+        /* === 選項按鈕 (Flexbox 左右排版) === */
         .option-btn {
-            display: block; width: 100%;
+            display: flex; justify-content: space-between; align-items: center; /* 讓文字靠左、圖示靠右 */
+            width: 100%;
             background-color: #262730; border: 1px solid #3a3b45; color: white;
-            padding: 10px 14px; border-radius: 8px; margin-bottom: 12px;
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;
             font-size: 16px; font-weight: 500; cursor: pointer;
             text-align: left; transition: 0.2s; box-sizing: border-box;
         }
         .option-btn:hover { border-color: #ffffff; }
         
-        /* 狀態顏色 */
-        .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default; text-align: center;}
-        .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default; text-align: center;}
-        .opt-selected { background-color: #3b82f6 !important; border-color: #60a5fa !important; text-align: center;}
+        /* 狀態顏色 (移除了之前的 text-align: center) */
+        .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default; }
+        .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default; }
+        .opt-selected { background-color: #3b82f6 !important; border-color: #60a5fa !important; }
         .opt-disabled { cursor: default; opacity: 0.8; }
-        .opt-center { text-align: center; } 
 
         /* === 導航按鈕區 === */
         .nav-container { display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 15px; }
         .nav-btn {
             width: 48%; background-color: #262730; border: 1px solid #3a3b45; color: white;
-            padding: 12px; border-radius: 8px; font-size: 15px; cursor: pointer;
+            padding: 12px; border-radius: 8px; font-size: 15px; cursor: pointer; text-align: center;
         }
         .nav-btn:hover { border-color: #ffffff; }
 
@@ -71,7 +71,6 @@
         }
         .sidebar h3 { text-align: center; margin-top: 0; font-size: 18px;}
         
-        /* 排除 close-btn，讓其他按鈕保持大按鈕樣式 */
         .sidebar select, .sidebar button:not(.close-btn) {
             width: 90%; margin: 8px 5%; padding: 10px; font-size: 15px; border-radius: 5px; box-sizing: border-box;
         }
@@ -79,7 +78,6 @@
         .btn-exam { background-color: #ef4444 !important; }
         .btn-exam:hover { background-color: #dc2626 !important; }
         
-        /* 專屬關閉按鈕樣式：乾淨、靠右、透明 */
         .close-btn {
             position: absolute; top: 10px; right: 15px; font-size: 28px;
             color: #a0a0a0; background: transparent; border: none; cursor: pointer;
@@ -290,7 +288,6 @@
         toggleSidebar();
     }
 
-    // === 考試計時器 ===
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         document.getElementById('timerContainer').classList.remove('hidden');
@@ -345,33 +342,32 @@
             let btn = document.createElement('button');
             btn.className = "option-btn";
             
+            let textHtml = `<span>${key}. ${val}</span>`;
+            let iconHtml = "";
+
             if (showCorrectness) {
                 if (userAns) { 
                     btn.classList.add("opt-disabled");
                     if (key === correctAns) {
                         btn.classList.add("opt-correct");
-                        btn.innerHTML = `✅ ${key}. ${val}`;
+                        iconHtml = `<span style="font-size: 18px;">✅</span>`;
                     } else if (key === userAns && userAns !== correctAns) {
                         btn.classList.add("opt-wrong");
-                        btn.innerHTML = `❌ ${key}. ${val}`;
-                    } else {
-                        btn.innerHTML = `&nbsp;&nbsp;&nbsp;${key}. ${val}`; 
+                        iconHtml = `<span style="font-size: 18px;">❌</span>`;
                     }
                 } else {
-                    btn.classList.add("opt-center");
-                    btn.innerHTML = `${key}. ${val}`;
                     if(!state.examFinished) btn.onclick = () => selectOption(key);
                 }
             } else {
+                // 考試中：顯示被選取的標記
                 if (key === userAns) {
                     btn.classList.add("opt-selected");
-                    btn.innerHTML = `🔘 ${key}. ${val}`;
-                } else {
-                    btn.classList.add("opt-center");
-                    btn.innerHTML = `${key}. ${val}`;
+                    iconHtml = `<span style="font-size: 18px;">🔘</span>`;
                 }
                 btn.onclick = () => selectOption(key); 
             }
+            
+            btn.innerHTML = `${textHtml}${iconHtml}`;
             container.appendChild(btn);
         }
 
@@ -399,12 +395,7 @@
     function selectOption(choice) {
         state.answers[state.currentIndex] = choice;
         saveProgress(); 
-        
-        if (state.mode === 'practice') {
-            renderQuestion();
-        } else {
-            renderQuestion(); 
-        }
+        renderQuestion(); 
     }
 
     function prevQuestion() {
