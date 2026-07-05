@@ -115,10 +115,10 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 # 未選擇的其他選項：保持深灰色
                 bg_color, border_color, text_color, icon = "#262730", "#3a3b45", "#ffffff", "⬜"
                 
-            # 移除 margin-bottom，調整 padding 到了 6px 12px 並加入 box-sizing，使其大小與原生按鈕完全一致不跳動
+            # 關鍵修正：加入 margin-bottom: 14px; 完美還原原生按鈕的間隔，padding 保持 8px 12px 維持大小不變
             st.markdown(f"""
             <div style="background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; 
-                        padding: 6px 12px; border-radius: 8px; font-size: 16px; font-weight: 500;
+                        padding: 8px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 16px; font-weight: 500;
                         text-align: center; box-sizing: border-box; width: 100%;">
                 {icon} {opt_letter}. {opt_text}
             </div>
@@ -131,8 +131,8 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 st.session_state.answers_dict[st.session_state.current_index] = opt_letter
                 st.rerun()
 
-    # 使用自訂 HTML 線條，將 margin-top 壓到極低的 2px，隨後直接緊跟按鈕，大幅縮小空隙
-    st.markdown("<hr style='margin-top: 2px; margin-bottom: 8px; border: 0; border-top: 1px solid #3a3b45;'>", unsafe_allow_html=True)
+    # 使用自訂 HTML 線條，大幅縮小與按鈕之間的空隙
+    st.markdown("<hr style='margin-top: 2px; margin-bottom: 10px; border: 0; border-top: 1px solid #3a3b45;'>", unsafe_allow_html=True)
     
     # --- 導航按鈕區 (全寬度、上下排列) ---
     # 1. 上方放「上一題」
