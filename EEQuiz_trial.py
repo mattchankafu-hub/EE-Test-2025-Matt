@@ -7,20 +7,26 @@ st.set_page_config(
     page_title="電工模擬試題練習系統",
     page_icon="⚡",
     layout="centered",
-    initial_sidebar_state="collapsed" # 手機上預設收起側邊欄，節省空間
+    initial_sidebar_state="collapsed" 
 )
 
-# --- 注入自訂 CSS 來壓縮頂部空間與強制按鈕左右並排 ---
+# --- 注入自訂 CSS 修正手機排版 ---
 st.markdown("""
     <style>
-    /* 大幅減少網頁頂部的預設空白 */
+    /* 調整頂部空間，留出安全距離避免被手機頂部列擋住 */
     .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
+        padding-top: 3rem !important; 
+        padding-bottom: 2rem !important;
     }
-    /* 強制 columns 在手機螢幕上也不要上下疊加，保持左右並排 */
+    
+    /* 強制所有分欄 (上一題/下一題按鈕) 在手機上保持左右並排，且精準各佔 50% 寬度 */
     [data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
+        gap: 10px !important; /* 兩個按鈕中間的空隙 */
+    }
+    [data-testid="column"] {
+        min-width: 0 !important;
+        flex: 1 1 50% !important; /* 強制各佔一半 */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -75,8 +81,8 @@ if st.session_state.all_questions:
         st.session_state.quiz_active = True
 
 # ================= 5. 主畫面：測驗與成績單 =================
-# 緊湊的標題
-st.markdown("<h3 style='margin-top: -10px; margin-bottom: 5px;'>⚡ 電工模擬試題</h3>", unsafe_allow_html=True)
+# 標題稍微向下移一點點，字體保持緊湊
+st.markdown("<h3 style='margin-top: 10px; margin-bottom: 5px;'>⚡ 電工模擬試題</h3>", unsafe_allow_html=True)
 
 if not st.session_state.quiz_active:
     st.info("👈 題庫已就緒！請打開左上角選單 (>) 選擇題組並點擊「開始測驗」。")
@@ -86,7 +92,6 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     current_q_count = st.session_state.current_index + 1
     total_q_count = len(st.session_state.current_questions)
     
-    # 壓縮進度顯示的空間
     st.caption(f"進度： {current_q_count} / {total_q_count}")
     st.progress(st.session_state.current_index / total_q_count)
     
@@ -99,7 +104,6 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
         "D": q_data['選擇D']
     }
     
-    # 顯示題目
     st.markdown(f"**第 {q_data['題號']} 題：**<br><span style='font-size: 18px;'>{q_data['題目']}</span>", unsafe_allow_html=True)
     st.write("")
     
@@ -117,8 +121,8 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 # 答錯：深紅色背景
                 bg_color, border_color, text_color, icon = "#d32f2f", "#b71c1c", "#ffffff", "❌"
             else:
-                # 未選擇的其他選項：融入深色模式的深灰色背景
-                bg_color, border_color, text_color, icon = "#2b2b33", "#444444", "#ffffff", "⬜"
+                # 未選擇的其他選項：保持深灰色，完美融入 Dark Mode
+                bg_color, border_color, text_color, icon = "#262730", "#3a3b45", "#ffffff", "⬜"
                 
             st.markdown(f"""
             <div style="background-color: {bg_color}; border: 1px solid {border_color}; color: {text_color}; 
@@ -137,7 +141,7 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
 
     st.write("---")
     
-    # --- 導航按鈕區 (強制左右並排，且全部取消 type="primary" 不變紅) ---
+    # --- 導航按鈕區 ---
     col1, col2 = st.columns(2)
     with col1:
         if st.session_state.current_index > 0:
@@ -148,7 +152,7 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
     with col2:
         if is_answered:
             if st.session_state.current_index < total_q_count - 1:
-                # 移除了 type="primary"，保持預設低調底色
+                # 取消了 type="primary"，保持預設低調的深灰色底色
                 if st.button("下一題 ➡️", use_container_width=True):
                     st.session_state.current_index += 1
                     st.rerun()
