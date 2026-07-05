@@ -6,7 +6,6 @@
     <title>電工模擬試題練習系統</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        
         /* === 基礎深色模式設定 === */
         body {
             background-color: #0e1117; color: #ffffff;
@@ -30,13 +29,19 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* === 題目區 === */
+        /* === 題目區與圖片 === */
         .question-title { font-size: 16px; font-weight: bold; color: #a0a0a0; margin-bottom: 5px; }
-        .question-text { font-size: 18px; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
+        .question-text { font-size: 18px; font-weight: bold; line-height: 1.5; margin-bottom: 15px; }
+        
+        .question-img { 
+            max-width: 100%; height: auto; border-radius: 8px; 
+            margin-bottom: 20px; border: 1px solid #3a3b45; box-sizing: border-box;
+            display: block; margin-left: auto; margin-right: auto;
+        }
 
         /* === 選項按鈕 (Flexbox 左右排版) === */
         .option-btn {
-            display: flex; justify-content: space-between; align-items: center; /* 讓文字靠左、圖示靠右 */
+            display: flex; justify-content: space-between; align-items: center; 
             width: 100%;
             background-color: #262730; border: 1px solid #3a3b45; color: white;
             padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;
@@ -45,7 +50,7 @@
         }
         .option-btn:hover { border-color: #ffffff; }
         
-        /* 狀態顏色 (移除了之前的 text-align: center) */
+        /* 狀態顏色 */
         .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default; }
         .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default; }
         .opt-selected { background-color: #3b82f6 !important; border-color: #60a5fa !important; }
@@ -132,6 +137,8 @@
         <div class="question-title" id="qNum">第 0 題</div>
         <div class="question-text" id="qText">載入中...</div>
         
+        <img id="qImage" class="question-img hidden" src="" alt="題目相關圖片">
+        
         <div id="optionsContainer"></div>
 
         <hr style="margin-top: 5px; margin-bottom: 10px;">
@@ -213,265 +220,3 @@
     function loadProgress() {
         const savedState = localStorage.getItem('EE_Quiz_Progress_V2');
         const savedQuestions = localStorage.getItem('EE_Quiz_Questions_V2');
-        
-        if (savedState && savedQuestions) {
-            state = JSON.parse(savedState);
-            currentQuestions = JSON.parse(savedQuestions);
-            document.getElementById('rangeSelect').value = state.selectedRange;
-            
-            if (state.mode === 'exam' && !state.examFinished) {
-                let now = new Date().getTime();
-                if (now >= state.examEndTime) {
-                    state.examFinished = true; 
-                }
-            }
-            
-            document.getElementById('loadingView').classList.add('hidden');
-            document.getElementById('resultView').classList.add('hidden');
-            document.getElementById('quizView').classList.remove('hidden');
-            
-            if (state.mode === 'exam' && !state.examFinished) startTimer();
-            renderQuestion();
-        } else {
-            document.getElementById('loadingView').classList.add('hidden');
-            toggleSidebar(); 
-        }
-    }
-
-    function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        sb.style.right = sb.style.right === '0px' ? '-260px' : '0px';
-    }
-
-    // === 模式控制 ===
-    function startPracticeMode() {
-        state.mode = 'practice';
-        state.examFinished = false;
-        state.selectedRange = document.getElementById('rangeSelect').value;
-        state.currentIndex = 0;
-        state.answers = {};
-        
-        let parts = state.selectedRange.split('-');
-        let startIdx = parseInt(parts[0]) - 1;
-        let endIdx = parseInt(parts[1]);
-        currentQuestions = allQuestions.slice(startIdx, endIdx);
-        
-        if(timerInterval) clearInterval(timerInterval);
-        
-        saveProgress();
-        document.getElementById('resultView').classList.add('hidden');
-        document.getElementById('quizView').classList.remove('hidden');
-        renderQuestion();
-        toggleSidebar();
-    }
-
-    function startExamMode() {
-        if(allQuestions.length === 0) return alert("題庫未載入！");
-        
-        let confirmStart = confirm("即將開始 60 分鐘模擬考，中途交卷或超時將自動結算成績。確定開始嗎？");
-        if(!confirmStart) return;
-
-        state.mode = 'exam';
-        state.examFinished = false;
-        state.currentIndex = 0;
-        state.answers = {};
-        state.examEndTime = new Date().getTime() + (60 * 60 * 1000); 
-        
-        let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-        currentQuestions = shuffled.slice(0, 100);
-        
-        saveProgress();
-        document.getElementById('resultView').classList.add('hidden');
-        document.getElementById('quizView').classList.remove('hidden');
-        
-        startTimer();
-        renderQuestion();
-        toggleSidebar();
-    }
-
-    function startTimer() {
-        if (timerInterval) clearInterval(timerInterval);
-        document.getElementById('timerContainer').classList.remove('hidden');
-        
-        timerInterval = setInterval(() => {
-            let now = new Date().getTime();
-            let distance = state.examEndTime - now;
-            
-            if (distance <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById('timerText').innerText = "⏳ 考試結束";
-                alert("⏳ 考試時間已到！系統將自動為您交卷並結算成績。");
-                showResults();
-                return;
-            }
-            
-            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            document.getElementById('timerText').innerText = `⏳ 剩餘時間: ${minutes}分 ${seconds < 10 ? '0':''}${seconds}秒`;
-        }, 1000);
-    }
-
-    // === 渲染畫面 ===
-    function renderQuestion() {
-        if (state.currentIndex >= currentQuestions.length) {
-            showResults();
-            return;
-        }
-
-        const qData = currentQuestions[state.currentIndex];
-        
-        if (state.mode === 'exam' && !state.examFinished) {
-            document.getElementById('timerContainer').classList.remove('hidden');
-        } else {
-            document.getElementById('timerContainer').classList.add('hidden');
-        }
-
-        let prefix = state.mode === 'exam' ? "模擬考" : "練習";
-        document.getElementById('qNum').innerText = `【${prefix}】 第 ${state.currentIndex + 1} 題 (原題號:${qData['題號']})`;
-        document.getElementById('qText').innerText = qData['題目'];
-
-        const container = document.getElementById('optionsContainer');
-        container.innerHTML = ""; 
-
-        const options = { 'A': qData['選擇A'], 'B': qData['選擇B'], 'C': qData['選擇C'], 'D': qData['選擇D'] };
-        const correctAns = (qData['答案'] || "").trim().toUpperCase();
-        const userAns = state.answers[state.currentIndex];
-
-        const showCorrectness = (state.mode === 'practice') || (state.mode === 'exam' && state.examFinished);
-
-        for (let [key, val] of Object.entries(options)) {
-            let btn = document.createElement('button');
-            btn.className = "option-btn";
-            
-            let textHtml = `<span>${key}. ${val}</span>`;
-            let iconHtml = "";
-
-            if (showCorrectness) {
-                if (userAns) { 
-                    btn.classList.add("opt-disabled");
-                    if (key === correctAns) {
-                        btn.classList.add("opt-correct");
-                        iconHtml = `<span style="font-size: 18px;">✅</span>`;
-                    } else if (key === userAns && userAns !== correctAns) {
-                        btn.classList.add("opt-wrong");
-                        iconHtml = `<span style="font-size: 18px;">❌</span>`;
-                    }
-                } else {
-                    if(!state.examFinished) btn.onclick = () => selectOption(key);
-                }
-            } else {
-                // 考試中：顯示被選取的標記
-                if (key === userAns) {
-                    btn.classList.add("opt-selected");
-                    iconHtml = `<span style="font-size: 18px;">🔘</span>`;
-                }
-                btn.onclick = () => selectOption(key); 
-            }
-            
-            btn.innerHTML = `${textHtml}${iconHtml}`;
-            container.appendChild(btn);
-        }
-
-        document.getElementById('btnPrev').style.visibility = state.currentIndex > 0 ? "visible" : "hidden";
-        
-        const btnNext = document.getElementById('btnNext');
-        if (state.currentIndex < currentQuestions.length - 1) {
-            btnNext.innerText = "下一題 ➡️";
-            btnNext.onclick = nextQuestion;
-        } else {
-            if (state.mode === 'exam' && !state.examFinished) {
-                btnNext.innerText = "正式交卷 🏆";
-            } else {
-                btnNext.innerText = "查看成績 🏆";
-            }
-            btnNext.onclick = showResults;
-        }
-
-        const total = currentQuestions.length;
-        const current = state.currentIndex + 1;
-        document.getElementById('progressText').innerText = `進度： ${current} / ${total}`;
-        document.getElementById('progressBar').style.width = `${(current / total) * 100}%`;
-    }
-
-    function selectOption(choice) {
-        state.answers[state.currentIndex] = choice;
-        saveProgress(); 
-        renderQuestion(); 
-    }
-
-    function prevQuestion() {
-        if (state.currentIndex > 0) {
-            state.currentIndex--;
-            saveProgress();
-            renderQuestion();
-        }
-    }
-
-    function nextQuestion() {
-        if (state.currentIndex < currentQuestions.length - 1) {
-            state.currentIndex++;
-            saveProgress();
-            renderQuestion();
-        }
-    }
-
-    // === 成績結算 ===
-    function showResults() {
-        if (state.mode === 'exam' && !state.examFinished) {
-            let confirmSubmit = confirm("確定要交卷結算成績嗎？交卷後將無法修改答案。");
-            if (!confirmSubmit && new Date().getTime() < state.examEndTime) return; 
-            
-            state.examFinished = true;
-            if(timerInterval) clearInterval(timerInterval);
-            saveProgress();
-        }
-
-        document.getElementById('quizView').classList.add('hidden');
-        document.getElementById('resultView').classList.remove('hidden');
-
-        document.getElementById('resultTitle').innerText = state.mode === 'exam' ? "🏆 模擬考結算成績" : "🎉 練習結束！";
-
-        let score = 0;
-        let total = currentQuestions.length;
-        let reportHTML = "";
-
-        currentQuestions.forEach((qData, idx) => {
-            let userAns = state.answers[idx];
-            let correctAns = (qData['答案'] || "").trim().toUpperCase();
-            
-            let jumpLink = `<a href="javascript:void(0)" onclick="jumpToQuestion(${idx})" style="color:#3b82f6; text-decoration:none; font-size:14px; float:right;">🔍 查看此題</a>`;
-
-            if (userAns === correctAns) {
-                score++;
-                reportHTML += `<div class="result-box result-correct"><b>第 ${idx + 1} 題 (原題號:${qData['題號']})：✅ 答對</b> ${jumpLink}</div>`;
-            } else if (!userAns) {
-                reportHTML += `<div class="result-box result-miss"><b>第 ${idx + 1} 題 (原題號:${qData['題號']})：⚠️ 未作答</b> ${jumpLink}<br><span style="color:#a0a0a0;">正確答案：${correctAns}</span></div>`;
-            } else {
-                reportHTML += `<div class="result-box result-wrong"><b>第 ${idx + 1} 題 (原題號:${qData['題號']})：❌ 答錯</b> ${jumpLink}<br><span style="color:#a0a0a0;">你的選擇：${userAns} | 正確答案：${correctAns}</span></div>`;
-            }
-        });
-
-        document.getElementById('scoreText').innerText = `${score} / ${total}`;
-        document.getElementById('percentText').innerText = `${((score/total)*100).toFixed(1)}%`;
-        document.getElementById('reportContainer').innerHTML = reportHTML;
-    }
-
-    function viewLastQuestion() {
-        state.currentIndex = 0; 
-        saveProgress();
-        document.getElementById('resultView').classList.add('hidden');
-        document.getElementById('quizView').classList.remove('hidden');
-        renderQuestion();
-    }
-    
-    function jumpToQuestion(idx) {
-        state.currentIndex = idx;
-        saveProgress();
-        document.getElementById('resultView').classList.add('hidden');
-        document.getElementById('quizView').classList.remove('hidden');
-        renderQuestion();
-    }
-</script>
-
-</body>
-</html>
