@@ -10,40 +10,39 @@ st.set_page_config(
     initial_sidebar_state="collapsed" 
 )
 
-# --- 注入自訂 CSS 徹底修正手機排版 ---
+# --- 注入自訂 CSS：靠左靠右的相對排版魔法 ---
 st.markdown("""
     <style>
-    /* 1. 調整整體網頁的上下左右邊距，讓手機螢幕利用率更高 */
+    /* 1. 調整頂部空間，加得更深，絕對不會再被手機頂部列或 Share 按鈕擋住 */
     .block-container {
-        padding-top: 2rem !important; 
+        padding-top: 3.5rem !important; 
         padding-bottom: 2rem !important;
         padding-left: 1rem !important; 
         padding-right: 1rem !important;
     }
     
-    /* === 2. 徹底解決手機版「上一題/下一題」按鈕超出螢幕的問題 === */
-    /* 強制水平容器不換行，並設定按鈕間距 */
+    /* === 2. 完美的「一個靠左、一個靠右」相對排版 === */
+    /* 將水平容器設定為 space-between (左右靠邊對齊) */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
+        justify-content: space-between !important; 
         flex-wrap: nowrap !important;
-        gap: 10px !important; 
+        gap: 0px !important; /* 取消硬性空隙，由 space-between 自動產生距離 */
         width: 100% !important;
     }
     
-    /* 強制裡面的兩個分欄「絕對均分」空間 */
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-        flex: 1 1 0px !important; 
-        width: 50% !important;
-        min-width: 0 !important; /* 這是關鍵：允許容器縮到比內容還小 */
+    /* 每個按鈕的容器固定佔用 47% 的寬度，留下 6% 的彈性空間作為中間的空隙 */
+    div[data-testid="column"] {
+        width: 47% !important;
+        flex: none !important;
+        min-width: 0 !important;
     }
     
-    /* 強制按鈕本身乖乖待在 50% 的容器內，絕對不准撐破 */
+    /* 確保按鈕本身乖乖填滿那 47% 的空間 */
     div[data-testid="stHorizontalBlock"] button {
         width: 100% !important;
-        min-width: 0 !important; /* 抵銷 Streamlit 按鈕的預設最小寬度 */
-        padding-left: 0px !important; 
-        padding-right: 0px !important;
+        min-width: 0 !important; 
     }
     </style>
 """, unsafe_allow_html=True)
