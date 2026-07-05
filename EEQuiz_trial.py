@@ -10,38 +10,41 @@ st.set_page_config(
     initial_sidebar_state="collapsed" 
 )
 
-# --- 注入自訂 CSS：百分比精準對齊魔法 ---
+# --- 注入自訂 CSS：殺掉負邊距，實作完美 48% 置中對齊 ---
 st.markdown("""
     <style>
     /* 1. 調整整體網頁的上下左右邊距 */
     .block-container {
         padding-top: 2.5rem !important; 
         padding-bottom: 2rem !important;
-        padding-left: 1rem !important; 
-        padding-right: 1rem !important;
+        padding-left: 1.2rem !important; 
+        padding-right: 1.2rem !important;
     }
     
-    /* === 2. 讓底部導航按鈕與答案按鈕完美對齊 === */
-    /* 設定水平容器為 100% 寬，並讓內部元素均勻分佈 */
+    /* === 2. 徹底解決按鈕飛出螢幕的元兇 === */
+    /* 殺掉 Streamlit 預設的負邊距與 Padding，改用純 Flexbox */
     div[data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
-        justify-content: center !important; /* 置中整個視窗 */
-        align-items: center !important;
         flex-wrap: nowrap !important;
+        justify-content: space-between !important;
         width: 100% !important;
-        gap: 4% !important; /* 中間精準留下 4% 的空隙 */
+        margin: 0 !important; /* <--- 解決飛出螢幕的關鍵：殺掉負邊距 */
+        padding: 0 !important;
+        gap: 4% !important; /* 確保中間有 4% 空隙 */
     }
     
-    /* 強制上一題、下一題的容器各佔 48% (48+4+48=100%，完美對齊上方答案) */
-    div[data-testid="column"] {
+    /* 強制上一題、下一題各佔 48% (48+4+48=100%，完美對齊上方答案) */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+        flex: 1 1 48% !important; 
         width: 48% !important;
-        flex: 0 0 48% !important; 
         min-width: 0 !important;
+        padding: 0 !important; /* 殺掉內部多餘空間 */
+        margin: 0 !important;
     }
     
     /* 確保按鈕本身乖乖填滿那 48% 的空間 */
-    div[data-testid="column"] button {
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] button {
         width: 100% !important;
         min-width: 0 !important; 
     }
@@ -98,7 +101,6 @@ if st.session_state.all_questions:
         st.session_state.quiz_active = True
 
 # ================= 5. 主畫面：測驗與成績單 =================
-# 標題稍微向下移一點點，字體保持緊湊
 st.markdown("<h3 style='margin-top: 5px; margin-bottom: 5px;'>⚡ 電工模擬試題</h3>", unsafe_allow_html=True)
 
 if not st.session_state.quiz_active:
@@ -138,7 +140,7 @@ elif st.session_state.current_index < len(st.session_state.current_questions):
                 # 答錯：深紅色背景
                 bg_color, border_color, text_color, icon = "#d32f2f", "#b71c1c", "#ffffff", "❌"
             else:
-                # 未選擇的其他選項：保持深灰色，完美融入 Dark Mode
+                # 未選擇的其他選項：保持深灰色
                 bg_color, border_color, text_color, icon = "#262730", "#3a3b45", "#ffffff", "⬜"
                 
             st.markdown(f"""
