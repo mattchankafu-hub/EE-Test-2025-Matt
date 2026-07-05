@@ -8,33 +8,18 @@
     <style>
         /* === 基礎深色模式設定 === */
         body {
-            background-color: #0e1117;
-            color: #ffffff;
+            background-color: #0e1117; color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+            margin: 0; padding: 0; display: flex; justify-content: center;
         }
         .container {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            box-sizing: border-box;
+            width: 100%; max-width: 600px; padding: 20px; box-sizing: border-box;
         }
         
         /* === 標題與選單列 === */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .header h3 { margin: 0; font-size: 20px; }
-        .menu-btn {
-            background: none; border: none; color: white;
-            font-size: 24px; cursor: pointer;
-        }
+        .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
         /* === 考試計時器 === */
         #timerContainer {
@@ -61,15 +46,12 @@
         /* 狀態顏色 */
         .opt-correct { background-color: #2e7d32 !important; border-color: #1b5e20 !important; cursor: default; text-align: center;}
         .opt-wrong { background-color: #d32f2f !important; border-color: #b71c1c !important; cursor: default; text-align: center;}
-        .opt-selected { background-color: #3b82f6 !important; border-color: #60a5fa !important; text-align: center;} /* 考試模式選取狀態 */
+        .opt-selected { background-color: #3b82f6 !important; border-color: #60a5fa !important; text-align: center;}
         .opt-disabled { cursor: default; opacity: 0.8; }
-        .opt-center { text-align: center; } /* 未作答時置中 */
+        .opt-center { text-align: center; } 
 
         /* === 導航按鈕區 === */
-        .nav-container {
-            display: flex; justify-content: space-between;
-            margin-top: 15px; margin-bottom: 15px;
-        }
+        .nav-container { display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 15px; }
         .nav-btn {
             width: 48%; background-color: #262730; border: 1px solid #3a3b45; color: white;
             padding: 12px; border-radius: 8px; font-size: 15px; cursor: pointer;
@@ -88,16 +70,23 @@
             box-shadow: -2px 0 5px rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;
         }
         .sidebar h3 { text-align: center; margin-top: 0; font-size: 18px;}
-        .sidebar select, .sidebar button {
+        
+        /* 排除 close-btn，讓其他按鈕保持大按鈕樣式 */
+        .sidebar select, .sidebar button:not(.close-btn) {
             width: 90%; margin: 8px 5%; padding: 10px; font-size: 15px; border-radius: 5px; box-sizing: border-box;
         }
-        .sidebar button { background-color: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold;}
+        .sidebar button:not(.close-btn) { background-color: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold;}
         .btn-exam { background-color: #ef4444 !important; }
         .btn-exam:hover { background-color: #dc2626 !important; }
+        
+        /* 專屬關閉按鈕樣式：乾淨、靠右、透明 */
         .close-btn {
-            position: absolute; top: 10px; left: 15px; font-size: 30px;
-            color: white; background: none; border: none; cursor: pointer;
+            position: absolute; top: 10px; right: 15px; font-size: 28px;
+            color: #a0a0a0; background: transparent; border: none; cursor: pointer;
+            padding: 5px; line-height: 1; transition: 0.2s;
         }
+        .close-btn:hover { color: #ffffff; }
+        
         hr { border: 0; border-top: 1px solid #3a3b45; margin: 10px 0 15px 0; }
         
         /* 隱藏區塊用 */
@@ -178,9 +167,9 @@
     let allQuestions = [];
     let currentQuestions = [];
     let state = {
-        mode: 'practice', // 'practice' 或是 'exam'
-        examFinished: false, // 考試是否已交卷
-        examEndTime: null, // 考試結束時間戳記
+        mode: 'practice', 
+        examFinished: false, 
+        examEndTime: null, 
         currentIndex: 0,
         answers: {}, 
         selectedRange: "1-50"
@@ -231,11 +220,10 @@
             currentQuestions = JSON.parse(savedQuestions);
             document.getElementById('rangeSelect').value = state.selectedRange;
             
-            // 如果是在考試模式中，檢查時間是否已經到了
             if (state.mode === 'exam' && !state.examFinished) {
                 let now = new Date().getTime();
                 if (now >= state.examEndTime) {
-                    state.examFinished = true; // 時間已過，自動設定為交卷
+                    state.examFinished = true; 
                 }
             }
             
@@ -247,7 +235,7 @@
             renderQuestion();
         } else {
             document.getElementById('loadingView').classList.add('hidden');
-            toggleSidebar(); // 第一次進入，直接展開右側選單讓用戶選擇
+            toggleSidebar(); 
         }
     }
 
@@ -257,7 +245,6 @@
     }
 
     // === 模式控制 ===
-    // 啟動練習模式
     function startPracticeMode() {
         state.mode = 'practice';
         state.examFinished = false;
@@ -279,7 +266,6 @@
         toggleSidebar();
     }
 
-    // 啟動考試模式
     function startExamMode() {
         if(allQuestions.length === 0) return alert("題庫未載入！");
         
@@ -290,9 +276,8 @@
         state.examFinished = false;
         state.currentIndex = 0;
         state.answers = {};
-        state.examEndTime = new Date().getTime() + (60 * 60 * 1000); // 60分鐘後
+        state.examEndTime = new Date().getTime() + (60 * 60 * 1000); 
         
-        // 隨機抽取 100 題
         let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
         currentQuestions = shuffled.slice(0, 100);
         
@@ -337,14 +322,12 @@
 
         const qData = currentQuestions[state.currentIndex];
         
-        // 考試模式顯示計時器，練習模式隱藏
         if (state.mode === 'exam' && !state.examFinished) {
             document.getElementById('timerContainer').classList.remove('hidden');
         } else {
             document.getElementById('timerContainer').classList.add('hidden');
         }
 
-        // 標題顯示
         let prefix = state.mode === 'exam' ? "模擬考" : "練習";
         document.getElementById('qNum').innerText = `【${prefix}】 第 ${state.currentIndex + 1} 題 (原題號:${qData['題號']})`;
         document.getElementById('qText').innerText = qData['題目'];
@@ -356,7 +339,6 @@
         const correctAns = (qData['答案'] || "").trim().toUpperCase();
         const userAns = state.answers[state.currentIndex];
 
-        // 判斷是否要顯示正確答案 (練習模式，或考試模式已交卷複習時)
         const showCorrectness = (state.mode === 'practice') || (state.mode === 'exam' && state.examFinished);
 
         for (let [key, val] of Object.entries(options)) {
@@ -364,7 +346,6 @@
             btn.className = "option-btn";
             
             if (showCorrectness) {
-                // === 顯示對錯模式 ===
                 if (userAns) { 
                     btn.classList.add("opt-disabled");
                     if (key === correctAns) {
@@ -379,11 +360,9 @@
                 } else {
                     btn.classList.add("opt-center");
                     btn.innerHTML = `${key}. ${val}`;
-                    // 只有未交卷且未作答時可以按 (練習模式)
                     if(!state.examFinished) btn.onclick = () => selectOption(key);
                 }
             } else {
-                // === 考試進行模式 (不顯示對錯，只標示選取，且可修改) ===
                 if (key === userAns) {
                     btn.classList.add("opt-selected");
                     btn.innerHTML = `🔘 ${key}. ${val}`;
@@ -391,12 +370,11 @@
                     btn.classList.add("opt-center");
                     btn.innerHTML = `${key}. ${val}`;
                 }
-                btn.onclick = () => selectOption(key); // 考試中隨時可更改答案
+                btn.onclick = () => selectOption(key); 
             }
             container.appendChild(btn);
         }
 
-        // 按鈕狀態控制
         document.getElementById('btnPrev').style.visibility = state.currentIndex > 0 ? "visible" : "hidden";
         
         const btnNext = document.getElementById('btnNext');
@@ -404,7 +382,6 @@
             btnNext.innerText = "下一題 ➡️";
             btnNext.onclick = nextQuestion;
         } else {
-            // 最後一題的按鈕
             if (state.mode === 'exam' && !state.examFinished) {
                 btnNext.innerText = "正式交卷 🏆";
             } else {
@@ -413,7 +390,6 @@
             btnNext.onclick = showResults;
         }
 
-        // 進度條
         const total = currentQuestions.length;
         const current = state.currentIndex + 1;
         document.getElementById('progressText').innerText = `進度： ${current} / ${total}`;
@@ -424,11 +400,10 @@
         state.answers[state.currentIndex] = choice;
         saveProgress(); 
         
-        // 如果是練習模式，選完自動跳下一題的延遲體驗；考試模式則停留在原地讓用戶確認
         if (state.mode === 'practice') {
             renderQuestion();
         } else {
-            renderQuestion(); // 更新藍色選項，不自動跳下一題
+            renderQuestion(); 
         }
     }
 
@@ -450,10 +425,9 @@
 
     // === 成績結算 ===
     function showResults() {
-        // 如果是考試模式，觸發交卷
         if (state.mode === 'exam' && !state.examFinished) {
             let confirmSubmit = confirm("確定要交卷結算成績嗎？交卷後將無法修改答案。");
-            if (!confirmSubmit && new Date().getTime() < state.examEndTime) return; // 如果時間還沒到且取消交卷，則返回
+            if (!confirmSubmit && new Date().getTime() < state.examEndTime) return; 
             
             state.examFinished = true;
             if(timerInterval) clearInterval(timerInterval);
@@ -473,7 +447,6 @@
             let userAns = state.answers[idx];
             let correctAns = (qData['答案'] || "").trim().toUpperCase();
             
-            // 報告清單加上內部跳轉，點擊可直接回去看那一題
             let jumpLink = `<a href="javascript:void(0)" onclick="jumpToQuestion(${idx})" style="color:#3b82f6; text-decoration:none; font-size:14px; float:right;">🔍 查看此題</a>`;
 
             if (userAns === correctAns) {
@@ -492,7 +465,7 @@
     }
 
     function viewLastQuestion() {
-        state.currentIndex = 0; // 回到第一題開始複習
+        state.currentIndex = 0; 
         saveProgress();
         document.getElementById('resultView').classList.add('hidden');
         document.getElementById('quizView').classList.remove('hidden');
